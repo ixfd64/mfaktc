@@ -148,8 +148,12 @@ jobs:
           SCRIPT: |
             cd /workspace
             zip -9 -j ${{ steps.prepare.outputs.BASE_NAME }}.zip *
+            CC_MIN_MINOR=$((${{ steps.prepare.outputs.CC_MIN }} % 10))
+            CC_MIN_MAJOR=$(((${{ steps.prepare.outputs.CC_MIN }} - $CC_MIN_MINOR) / 10))
+            CC_MAX_MINOR=$((${{ steps.prepare.outputs.CC_MAX }} % 10))
+            CC_MAX_MAJOR=$(((${{ steps.prepare.outputs.CC_MAX }} - $CC_MAX_MINOR) / 10))
             echo "[${{ steps.prepare.outputs.BASE_NAME }}.zip](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ steps.prepare.outputs.BASE_NAME }}.zip) | \
-            ${{ matrix.sys.cuda_version }} | ${{ steps.prepare.outputs.CC_MIN }}-${{ steps.prepare.outputs.CC_MAX }} | ${{ steps.prepare.outputs.OS_VER }} | \
+            ${{ matrix.sys.cuda_version }} | $CC_MIN_MAJOR.$CC_MIN_MINOR-$CC_MAX_MAJOR.$CC_MAX_MINOR | ${{ steps.prepare.outputs.OS_VER }} | \
             ${{ steps.prepare.outputs.COMPILER_VER }} | ${{ steps.prepare.outputs.NVCC_VER }}" > ${{ steps.prepare.outputs.BASE_NAME }}.txt
         run: docker exec build-container bash -c "$SCRIPT"
 
@@ -256,8 +260,12 @@ jobs:
         run: |
           choco install -y --no-progress zip
           zip -9 -j "${{ steps.prepare.outputs.BASE_NAME }}.zip" *
+                      CC_MIN_MINOR=$((${{ steps.prepare.outputs.CC_MIN }} % 10))
+                      CC_MIN_MAJOR=$(((${{ steps.prepare.outputs.CC_MIN }} - $CC_MIN_MINOR) / 10))
+                      CC_MAX_MINOR=$((${{ steps.prepare.outputs.CC_MAX }} % 10))
+                      CC_MAX_MAJOR=$(((${{ steps.prepare.outputs.CC_MAX }} - $CC_MAX_MINOR) / 10))
           echo "[${{ steps.prepare.outputs.BASE_NAME }}.zip](https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/${{ steps.prepare.outputs.BASE_NAME }}.zip) | \
-          ${{ matrix.sys.cuda_version }} | ${{ steps.prepare.outputs.CC_MIN }}-${{ steps.prepare.outputs.CC_MAX }} | ${{ steps.prepare.outputs.OS_VER }} | \
+          ${{ matrix.sys.cuda_version }} | $CC_MIN_MAJOR.$CC_MIN_MINOR-$CC_MAX_MAJOR.$CC_MAX_MINOR | ${{ steps.prepare.outputs.OS_VER }} | \
           ${{ steps.prepare.outputs.COMPILER_VER }} | ${{ steps.prepare.outputs.NVCC_VER }}" > ${{ steps.prepare.outputs.BASE_NAME }}.txt
 
       - name: Upload build artifacts
